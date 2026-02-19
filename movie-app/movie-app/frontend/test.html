@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MovieMatch - Debug Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f5f5f5; }
+        .test { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; border: 1px solid #ddd; }
+        .pass { border-left: 4px solid #27ae60; }
+        .fail { border-left: 4px solid #e74c3c; }
+        h1 { color: #FF6B35; }
+        code { background: #eee; padding: 2px 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🎬 MovieMatch - Diagnostic Test</h1>
+    
+    <div id="results"></div>
+
+    <script>
+        const tests = [];
+        
+        async function runTest(name, fn) {
+            try {
+                const result = await fn();
+                tests.push({ name, passed: true, result });
+            } catch (error) {
+                tests.push({ name, passed: false, error: error.message });
+            }
+        }
+
+        async function runTests() {
+            // Test 1: Backend Health
+            await runTest("Backend Health Check", async () => {
+                const res = await fetch("http://localhost:5000/health");
+                if (!res.ok) throw new Error("Status: " + res.status);
+                const data = await res.json();
+                if (!data.model_loaded) throw new Error("Model not loaded");
+                return "Backend is healthy ✓";
+            });
+
+            // Test 2: Trending Movies
+            await runTest("Trending Movies API", async () => {
+                const res = await fetch("http://localhost:5000/tmdb/trending");
+                const data = await res.json();
+                if (!data.results || data.results.length === 0) throw new Error("No results");
+                return `Got ${data.results.length} trending movies`;
+            });
+
+            // Test 3: Search API
+            await runTest("Search API", async () => {
+                const res = await fetch("http://localhost:5000/tmdb/search?query=Avatar");
+                const data = await res.json();
+                if (!data.results || data.results.length === 0) throw new Error("No results");
+                return `Found ${data.results.length} movies for "Avatar"`;
+            });
+
+            // Test 4: Recommendations
+            await runTest("Recommendations API", async () => {
+                const res = await fetch("http://localhost:5000/tmdb/matching", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ movie_name: "Avatar" })
+                });
+                const data = await res.json();
+                if (!data.recommendations || data.recommendations.length === 0) 
+                    throw new Error("No recommendations");
+                return `Got ${data.recommendations.length} recommendations`;
+            });
+
+            // Test 5: Frontend Modules
+            await runTest("Frontend Modules", async () => {
+                // Check if modules are loaded
+                const modules = ["CONFIG", "APIService", "UIModule", "NavigationModule", "SearchModule", "TrendingModule", "ResultsModule"];
+                const missing = modules.filter(m => typeof window[m] === "undefined");
+                if (missing.length > 0) throw new Error("Missing: " + missing.join(", "));
+                return "All modules loaded ✓";
+            });
+
+            // Render results
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = tests.map(test => `
+                <div class="test ${test.passed ? 'pass' : 'fail'}">
+                    <strong>${test.name}</strong><br>
+                    ${test.passed ? "✓ " + test.result : "✗ " + test.error}
+                </div>
+            `).join("");
+
+            // Summary
+            const passed = tests.filter(t => t.passed).length;
+            const total = tests.length;
+            const summary = `<div style="margin-top: 20px; padding: 15px; background: ${passed === total ? '#d4edda' : '#f8d7da'}; border-radius: 5px;">
+                <strong>${passed}/${total} tests passed</strong>
+                ${passed === total ? "✓ Everything is working!" : "⚠ Some tests failed. Check console for details."}
+            </div>`;
+            resultsDiv.innerHTML += summary;
+        }
+
+        // Run tests when page loads
+        window.addEventListener("load", () => {
+            setTimeout(runTests, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+# ==============================================================================
+# CONDA ENVIRONMENT CONFIGURATION FILE
+# ==============================================================================
+# 
+# PURPOSE:
+#   This file defines a reproducible Python environment for the movie 
+#   recommendation project. It ensures that anyone running this project 
+#   will have exactly the same package versions (no "it works on my machine").
+#
+# WHY USE CONDA?
+#   - Conda handles both Python packages AND system-level dependencies
+#   - Creates isolated environments (doesn't affect your system Python)
+#   - Reproducible: Same file = Same versions across machines
+#   - Better than venv for Data Science & ML projects
+#
+# HOW TO USE:
+#   1. Navigate to project root: cd /home/muhammad-ahmad/titanic/movie-app
+#   2. Create environment: conda env create -f environment.yml
+#   3. Activate it: conda activate movie-recommender
+#   4. Deactivate it: conda deactivate
+#
+# ==============================================================================
+
+# Project name - used in "conda activate movie-recommender"
+name: movie-recommender
+
+# CHANNELS EXPLAINED (The "Channels" concept):
+# ============================================
+# Channels are repositories/sources where Conda downloads packages from.
+# Think of them like NPM repositories, but for Python packages.
+#
+# - conda-forge: 
+#     - Community-maintained repository (like GitHub alternatives)
+#     - Has packages that official Conda doesn't have
+#     - More up-to-date than defaults
+#     - Order matters: conda-forge is searched FIRST
+#   - defaults: 
+#     - Official Anaconda company repository
+#     - More stable, enterprise-backed
+#     - Fallback if package not found in conda-forge
+#
+# WHY BOTH? 
+#   Some packages only exist in one or the other. By listing both,
+#   Conda can find packages from either source. Order = Priority.
+#
+channels:
+  - conda-forge    # Search here first (community packages)
+  - defaults       # Fallback to official Anaconda repository
+
+# DEPENDENCIES SECTION
+# ====================
+# Packages installed from conda channels
+dependencies:
+  # Python version pinning (BEST PRACTICE)
+  # ======================================
+  # "=3.10" means EXACTLY version 3.10.x
+  # Why pin? Ensures code works across machines, prevents major version breaks
+  # Example: Different syntax between Python 3.9 and 3.10
+  - python=3.10
+  
+  # Data Science Stack (Common ML packages)
+  - pandas       # Data manipulation (like SQL for Python)
+  - numpy        # Numerical computing (arrays, math operations)
+  - scikit-learn # Machine Learning algorithms (similarity, vectors, etc.)
+  - nltk         # Natural Language Processing (stemming, tokenization)
+  
+  # Pip package manager (meta-package)
+  # Installed via conda, but allows installing from PyPI (Python Package Index)
+  # Think: conda for system + Python packages, pip for pure Python packages
+  - pip
+  
+  # PIP PACKAGES (PyPI - Python Package Index)
+  # ==========================================
+  # These are installed using PIP inside the Conda environment.
+  # Why separate? Some packages only exist on PyPI, not Conda channels.
+  # PyPI = NPM for Python (https://pypi.org)
+  #
+  pip:
+    # Flask: Web framework (like Express.js for Python)
+    # Used to: Create REST API endpoints, handle HTTP requests
+    # Best Practice: Pin to specific version (2.3.3) for reproducibility
+    - flask==2.3.3
+    
+    # Flask-CORS: Cross-Origin Resource Sharing plugin
+    # Problem it solves: 
+    #   Frontend (localhost:8000) can't talk to API (localhost:5000) 
+    #   due to browser's same-origin policy
+    # Solution: CORS headers allow cross-origin requests
+    # Example: header like "Access-Control-Allow-Origin: *"
+    - flask-cors==4.0.0

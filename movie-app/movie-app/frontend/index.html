@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- META TAGS -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 MovieMatch - AI Recommendation Engine</title>
+    
+    <!-- EXTERNAL STYLESHEETS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ===== NAVBAR ===== -->
+    <nav>
+        <div class="logo">🎬 MovieMatch</div>
+        <ul>
+            <li><a onclick="NavigationModule.showHome()">Home</a></li>
+            <li><a href="#trending">Trending</a></li>
+            <li><a href="#search">Search</a></li>
+        </ul>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main>
+        <!-- ERROR MESSAGE -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- HERO SECTION (HOME) -->
+        <section class="hero" id="heroSection">
+            <h1>🎯 MovieMatch</h1>
+            <p>Discover movies you'll love using AI-powered recommendations</p>
+
+            <!-- SEARCH SECTION -->
+            <div class="search-container">
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Search for a movie... (e.g., Avatar, Inception)"
+                        autocomplete="off"
+                    >
+                    <button onclick="SearchModule.handleSearchClick()">Search & Get Recommendations</button>
+                    <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRENDING SECTION -->
+        <section class="trending-section" id="trendingSection">
+            <h2>🔥 Trending This Week</h2>
+            <div class="movies-grid" id="trendingGrid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- RESULTS SECTION -->
+        <section class="results-section" id="resultsSection">
+            <a class="back-btn" onclick="NavigationModule.showHome()">← Back to Home</a>
+            
+            <div class="results-header">
+                <h2 id="resultsTitle"></h2>
+                <p id="resultsSubtitle"></p>
+            </div>
+
+            <div id="resultsContent">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="powered-by">
+            Powered by AI ML Model | Movie data from 
+            <a href="https://www.themoviedb.org/" target="_blank">TMDB</a>
+        </div>
+    </footer>
+
+    <!-- EXTERNAL SCRIPTS -->
+    <script src="script.js"></script>
+</body>
+</html>

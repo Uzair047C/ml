@@ -1,0 +1,150 @@
+# ==============================================================================
+# PYTHON DEPENDENCIES - REQUIREMENTS.TXT
+# ==============================================================================
+#
+# PURPOSE:
+#   File that lists all Python packages needed for this project
+#   Equivalent to Node.js package.json
+#
+# FORMAT:
+#   package==version  (pins to exact version)
+#   package>=version  (at least this version, allows updates)
+#   package           (any version)
+#
+# BEST PRACTICES:
+#   - Always pin versions for production (reproducibility)
+#   - Use ==version.version.patch (semantic versioning)
+#   - Remove unused packages (clean dependencies)
+#   - Update regularly for security patches
+#
+# HOW TO USE:
+#   pip install -r requirements.txt
+#
+# GENERATING THIS FILE:
+#   pip freeze > requirements.txt  (from Python environment)
+#
+# ==============================================================================
+
+# WEB FRAMEWORK
+# =============
+# Flask: Lightweight Python web framework
+# Similar to: Express.js, FastAPI, Django
+# Used for: Creating REST API endpoints, routing, request handling
+# Pinned to: 2.3.3 (compatible with Python 3.10, stable)
+flask==2.3.3
+
+# CORS SUPPORT
+# ============
+# Flask-CORS: Plugin for Flask to handle Cross-Origin requests
+# Problem: Frontend on localhost:8000 can't call API on localhost:5000
+# Solution: Add CORS headers to allow cross-origin requests
+# Header example: Access-Control-Allow-Origin: *
+flask-cors==4.0.0
+
+# DATA MANIPULATION
+# ================
+# pandas: Data analysis library (Excel-like tables in Python)
+# Used for: Loading CSV, filtering, transforming data
+# 2.0.3: Recent version with performance improvements
+pandas==2.0.3
+
+# NUMERICAL COMPUTING
+# ===================
+# numpy: NumPy (Numerical Python) - foundation for all data science
+# Used for: Array operations, mathematical computations, matrix operations
+# 1.24.3: Compatible with scikit-learn and other libraries
+numpy==1.24.3
+
+# MACHINE LEARNING
+# ================
+# scikit-learn: Machine learning algorithms and utilities
+# Used for:
+#   - CountVectorizer: Convert text to numeric vectors
+#   - TfidfVectorizer: Text vectorization with weighting
+#   - cosine_similarity: Compute similarity between vectors
+#
+# Why pin to 1.3.0?
+#   - Stable release with bug fixes
+#   - Compatible with numpy 1.24.3
+#   - Breaking changes in newer versions (test before upgrading)
+#
+scikit-learn==1.3.0
+
+# NATURAL LANGUAGE PROCESSING
+# ===========================
+# NLTK: Natural Language Toolkit
+# Used for:
+#   - PorterStemmer: Reduce words to root form (loves → love)
+#   - Word tokenization: Split text into words
+#   - Text preprocessing
+#
+# Common alternatives:
+#   - spaCy: More advanced, production-ready
+#   - TextBlob: Simple NLP wrapper
+#   - VADER: Sentiment analysis specific
+#
+nltk==3.8.1
+
+# ==============================================================================
+# OPTIONAL ADVANCED PACKAGES (For learning/future use)
+# ==============================================================================
+#
+# Uncomment if needed:
+#
+# # Request library (for health checks in Dockerfile)
+requests==2.31.0
+
+# # Code quality checking
+# flake8==6.0.0
+# black==23.7.0  (code formatter)
+#
+# # Testing
+# pytest==7.4.0
+# pytest-cov==4.1.0  (coverage reports)
+#
+# # Production server (instead of Flask debug server)
+# gunicorn==21.2.0
+#
+# # Advanced ML
+# scikit-optimize==0.9.1  (hyperparameter tuning)
+# FAISS==1.7.4  (fast similarity search, for 1M+ items)
+#
+# # Model versioning & tracking
+# mlflow==2.7.0
+#
+# # Database ORM
+# SQLAlchemy==2.0.20
+#
+# # API documentation
+# flasgger==0.9.5.3  (Swagger for Flask)
+#
+# # Async task queue (for long-running tasks)
+# celery==5.3.1
+# redis==5.0.0
+#
+# ==============================================================================
+# VERSION MANAGEMENT NOTES
+# ==============================================================================
+#
+# SEMANTIC VERSIONING: X.Y.Z
+#   X: Major version (breaking changes)
+#   Y: Minor version (new features, backward compatible)
+#   Z: Patch version (bug fixes)
+#
+# EXAMPLE: flask==2.3.3
+#   2: Major version (Flask 2.x)
+#   3: Minor version (feature release)
+#   3: Patch version (bug fixes for 2.3)
+#
+# UPDATING PACKAGES:
+#   pip list --outdated  (see available updates)
+#   pip install --upgrade flask  (update single package)
+#   pip install -r requirements.txt --upgrade  (update all)
+#
+# TESTING AFTER UPDATE:
+#   1. Update locally & test
+#   2. Run train_and_save_model.py
+#   3. Test API endpoints
+#   4. Only then update in production
+#
+# ==============================================================================

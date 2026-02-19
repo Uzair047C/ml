@@ -1,0 +1,222 @@
+# ==============================================================================
+# DOCKER COMPOSE - CONTAINER ORCHESTRATION
+# ==============================================================================
+#
+# PURPOSE:
+#   Define multiple containers and how they communicate
+#   Think: docker-compose.yml = package.json for Docker
+#
+# WHY DOCKER COMPOSE?
+#   Problem: docker run has 20+ flags, easy to mess up
+#   Solution: YAML file defines all configuration
+#   Benefits:
+#     - Reproducible: Same file = same setup every time
+#     - Easy to manage multiple containers
+#     - Networks containers automatically
+#     - Manage volumes, environment variables, ports
+#
+# USE CASES:
+#   Development: Local multi-container setup
+#   Testing: Isolated test environments
+#   Production: Kubernetes (Compose → Helm/Kustomize)
+#
+# YAML SYNTAX BASICS:
+#   - Key: value pairs
+#   - Indentation = hierarchy (spaces, not tabs)
+#   - Lists: items starting with -
+#   - Comments: Lines starting with #
+#
+# ==============================================================================
+
+version: '3.8'
+
+# SERVICES: Containers to run
+# ==============================================================================
+services:
+  
+  # API SERVICE
+  # ===========
+  api:
+    # BUILD: How to build the image
+    # Alternative: image: python:3.10  (use existing image)
+    build:
+      context: .           # Directory with Dockerfile (project root)
+      dockerfile: backend/Dockerfile  # Path to Dockerfile
+    
+    # CONTAINER NAME: Name for docker ps, docker logs, etc.
+    # Without this: Docker generates random names (movie-app_api_1)
+    container_name: movie-rec-api
+    
+    # PORTS: Map container port to host port
+    # Format: "host:container"
+    # port 5000 inside container → available on port 5000 on computer
+    # Access: http://localhost:5000/health
+    ports:
+      - "5000:5000"
+    
+    # ENVIRONMENT VARIABLES: App configuration
+    # 
+    # FLASK_ENV:
+    #   development: Auto-reload on code changes, detailed errors
+    #   production: Optimized, no debug info
+    # 
+    # FLASK_APP: Python module with Flask app
+    #   Tells Flask where to find the app (finds app.py automatically)
+    #
+    # Use Cases:
+    #   - Database credentials
+    #   - API keys
+    #   - Feature flags
+    #   - Debug settings
+    #
+    # Security: Don't commit secrets to .yml (use .env file)
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
+    
+    # VOLUMES: Mount directories from host into container
+    # Format: "host_path:container_path"
+    #
+    # ./backend:/app
+    #   Host diretory: ./backend (project backend/ folder)
+    #   Container path: /app (where WORKDIR is in Dockerfile)
+    #
+    # Why? Code changes on host → reflected in container instantly
+    #      Enables live development without rebuilding
+    #      Only use in development (slow, security risk)
+    #
+    volumes:
+      - ./backend:/app
+    
+    # COMMAND: Startup command (overrides FROM CMD in Dockerfile)
+    # Use: docker-compose exec api python train_and_save_model.py
+    #      to override with different command
+    command: python app.py
+    
+    # NETWORKS: Which networks this container joins
+    # See networks section below
+    networks:
+      - movie-net
+
+
+  # OPTIONAL: NGINX REVERSE PROXY (commented out)
+  # ============================================
+  # Commented for learning purposes, uncomment for production
+  #
+  # Why Nginx?
+  #   - Load balancing (distribute traffic)
+  #   - Static file serving (frontend files)
+  #   - SSL/TLS (HTTPS)
+  #   - Caching layer
+  #   - Security (hide internal services)
+  #
+  # nginx:
+  #   image: nginx:latest
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./frontend:/usr/share/nginx/html
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #   networks:
+  #     - movie-net
+
+
+# NETWORKS: Container communication layer
+# ==============================================================================
+#
+# NETWORK PURPOSE:
+#   - Containers on same network can see each other by name
+#   - By default, containers are isolated (can't talk)
+#   - Services use service name as hostname (api:5000 instead of IP)
+#
+# NETWORK DRIVERS:
+#   - bridge (default for Compose): Virtual network between containers
+#   - host: Use host's network (faster, less isolation)
+#   - overlay: For Docker Swarm (multi-host)
+#   - macvlan: Assign MAC addresses (advanced)
+#
+# EXAMPLE USAGE:
+#   If nginx needed to call api:
+#     Instead of: http://172.20.0.2:5000  (IP address, fragile)
+#     Use:        http://api:5000         (service name, stable)
+#
+networks:
+  movie-net:
+    driver: bridge
+
+# ==============================================================================
+# DOCKER COMPOSE COMMANDS
+# ==============================================================================
+#
+# Start all services:
+#   docker-compose up
+#   --detach: Run in background (-d)
+#
+# Stop all services:
+#   docker-compose down
+#   --volumes: Also remove data volumes
+#
+# View logs:
+#   docker-compose logs
+#   --follow: Stream logs in real-time (-f)
+#   docker-compose logs api  (specific service)
+#
+# Execute command in running service:
+#   docker-compose exec api bash  (open terminal inside container)
+#   docker-compose exec api python train_and_save_model.py
+#
+# Restart service:
+#   docker-compose restart api
+#
+# Rebuild image:
+#   docker-compose build
+#   --no-cache: Don't use cached layers
+#
+# ==============================================================================
+# LOCAL DEVELOPMENT WORKFLOW
+# ==============================================================================
+#
+# 1. Start containers:
+#    docker-compose up
+#
+# 2. Edit backend/app.py (changes auto-reflect due to volumes)
+#
+# 3. See logs for errors:
+#    docker-compose logs -f api
+#
+# 4. Test changes:
+#    curl http://localhost:5000/health
+#
+# 5. Train model (if needed):
+#    docker-compose exec api python train_and_save_model.py
+#
+# 6. Stop when done:
+#    docker-compose down
+#
+# ==============================================================================
+# PRODUCTION CONSIDERATIONS
+# ==============================================================================
+#
+# Docker Compose is for DEVELOPMENT/SMALL DEPLOYMENTS
+#
+# LIMITATIONS:
+#   - Single machine (doesn't scale across servers)
+#   - No auto-restart on failure
+#   - No rolling updates
+#   - No health-based recovery
+#
+# PRODUCTION ALTERNATIVES:
+#   - Docker Swarm: Simple orchestration (built-in to Docker)
+#   - Kubernetes: Industry standard (complex, powerful)
+#   - AWS ECS: AWS native orchestration
+#   - Google Cloud Run: Serverless (no container management)
+#
+# FROM COMPOSE TO PRODUCTION:
+#   1. docker-compose.yml → Kubernetes Deployment manifest
+#   2. Use Helm or Kustomize for templating
+#   3. Add ingress (load balancer)
+#   4. Add persistent storage (volumes)
+#   5. Add monitoring/logging
+#   6. Add auto-scaling policies
+#
+# ==============================================================================
