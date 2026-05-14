@@ -1,0 +1,3 @@
+[submodule "supervised learning/titanic"]
+	path = supervised learning/titanic
+	url = https://github.com/Uzair047C/titanic.git
