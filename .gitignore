@@ -1,4 +1,5 @@
 /.venv
 /.venv-1
 /.vscode
-/titanic
+/titanicsupervised learning/movie_recomend/
+supervised learning/titanic_backup_*/
